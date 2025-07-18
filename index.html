@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fake News Detector 🔍</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #1f1c2c, #928dab);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .card {
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.2);
+      width: 90%;
+      max-width: 600px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    textarea {
+      width: 100%;
+      height: 150px;
+      border-radius: 0.5rem;
+      border: none;
+      padding: 1rem;
+      font-size: 1rem;
+      resize: none;
+      background: #fff;
+      color: #000;
+    }
+    button {
+      margin-top: 1rem;
+      width: 100%;
+      padding: 0.8rem;
+      font-size: 1rem;
+      background-color: #00c9ff;
+      border: none;
+      border-radius: 0.5rem;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #92fe9d;
+    }
+    .result {
+      margin-top: 1.5rem;
+      text-align: center;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>📰 Fake News Detector</h1>
+    <textarea id="newsText" placeholder="Paste news content here..."></textarea>
+    <button onclick="checkNews()">Check Now</button>
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    async function checkNews() {
+      const text = document.getElementById('newsText').value;
+      const resultDiv = document.getElementById('result');
+      resultDiv.textContent = 'Analyzing...';
+
+      try {
+        const response = await fetch('http://localhost:5000/predict', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ text })
+        });
+
+        const data = await response.json();
+        resultDiv.innerHTML = `
+          <span style="color: ${data.label === 'FAKE' ? 'red' : 'lightgreen'}">${data.label}</span><br>
+          Confidence: ${data.confidence}%
+        `;
+      } catch (error) {
+        resultDiv.textContent = 'Error detecting news. Try again.';
+      }
+    }
+  </script>
+</body>
+</html>
